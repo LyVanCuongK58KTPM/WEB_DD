@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống điểm danh</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <div class="login-box">
+                <h1>Đăng nhập</h1>
+                <p class="subtitle">Hệ thống điểm danh sinh viên</p>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Tên đăng nhập</label>
+                        <input type="text" id="username" required placeholder="Nhập tên đăng nhập">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input type="password" id="password" required placeholder="Nhập mật khẩu">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                </form>
+                
+                <div id="message" class="message"></div>
+                
+                <div id="tokenBox" class="token-box" style="display: none;">
+                    <h3>Token đăng nhập</h3>
+                    <div class="token-content">
+                        <code id="tokenValue"></code>
+                    </div>
+                    <button onclick="copyToken()" class="btn btn-secondary">
+                        <span>📋</span> Copy Token
+                    </button>
+                    <button onclick="continueToSystem()" class="btn btn-success">
+                        Tiếp tục vào hệ thống
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sinhvienPage" class="page">
+        <div class="dashboard-container">
+            <nav class="navbar">
+                <h1>🎓 Hệ thống điểm danh - Sinh viên</h1>
+                <div class="user-info">
+                    <span id="svUserName">Loading...</span>
+                    <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+                </div>
+            </nav>
+            
+            <div class="main-content">
+                <div class="profile-card" id="svProfileCard">
+                    <h2>📋 Thông tin cá nhân</h2>
+                    <div class="loading">Đang tải thông tin</div>
+                </div>
+                
+                <div class="menu-grid">
+                    <div class="menu-card" onclick="showSVSection('lichhoc')">
+                        <div class="icon">📅</div>
+                        <h3>Lịch học</h3>
+                        <p>Xem lịch học trong học kỳ</p>
+                    </div>
+                    
+                    <div class="menu-card" onclick="showSVSection('diemdanh')">
+                        <div class="icon">✅</div>
+                        <h3>Kết quả điểm danh</h3>
+                        <p>Xem lịch sử điểm danh của bạn</p>
+                    </div>
+                </div>
+                
+                <div class="section-card" id="svLichhocSection" style="display: none;">
+                    <h2>📅 Lịch học của bạn</h2>
+                    <div id="svLichhocContent" class="loading">Đang tải lịch học</div>
+                </div>
+                
+                <div class="section-card" id="svDiemdanhSection" style="display: none;">
+                    <h2>✅ Kết quả điểm danh</h2>
+                    <div id="svDiemdanhContent" class="loading">Đang tải dữ liệu</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="giaovienPage" class="page">
+        <div class="dashboard-container">
+            <nav class="navbar">
+                <h1>👨‍🏫 Hệ thống điểm danh - Giáo viên</h1>
+                <div class="user-info">
+                    <span id="gvUserName">Loading...</span>
+                    <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+                </div>
+            </nav>
+            
+            <div class="main-content">
+                <div class="profile-card" id="gvProfileCard">
+                    <h2>📋 Thông tin cá nhân</h2>
+                    <div class="loading">Đang tải thông tin</div>
+                </div>
+                
+                <div class="menu-grid">
+                    <div class="menu-card" onclick="showGVSection('lichday')">
+                        <div class="icon">📚</div>
+                        <h3>Lịch dạy</h3>
+                        <p>Xem lịch giảng dạy của bạn</p>
+                    </div>
+                    
+                    <div class="menu-card" onclick="showGVSection('diemdanh')">
+                        <div class="icon">✅</div>
+                        <h3>Danh sách điểm danh</h3>
+                        <p>Xem điểm danh sinh viên các lớp</p>
+                    </div>
+                </div>
+                
+                <div class="section-card" id="gvLichdaySection" style="display: none;">
+                    <h2>📚 Lịch giảng dạy</h2>
+                    <div id="gvLichdayContent" class="loading">Đang tải lịch dạy</div>
+                </div>
+                
+                <div class="section-card" id="gvDiemdanhSection" style="display: none;">
+                    <h2>✅ Danh sách điểm danh sinh viên</h2>
+                    
+                    <div class="select-wrapper">
+                        <label for="monHocSelect">Chọn môn học / lớp:</label>
+                        <select id="monHocSelect">
+                            <option value="">-- Chọn môn học / lớp --</option>
+                        </select>
+                    </div>
+                    
+                    <div id="gvDiemdanhContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+<div id="editProfileModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; padding: 20px; background: white; position: relative;">
+            <span class="close-modal" onclick="closeEditModal()" style="color: black; top: 10px; right: 15px;">&times;</span>
+            <h2 style="color: var(--primary-color); text-align: center; margin-bottom: 20px;">✏️ Cập nhật thông tin</h2>
+            
+            <form onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label>Email liên hệ:</label>
+                    <input type="email" id="edit_email" required>
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại:</label>
+                    <input type="text" id="edit_sdt" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Lưu thay đổi</button>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
